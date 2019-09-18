@@ -18,7 +18,9 @@
 This file is the implementation of FMScore class.
 */
 
-#if USEORGCODE
+// #define USEORGCODE
+
+#ifdef USEORGCODE
 #include <pmmintrin.h>  // for SSE
 #endif
 
@@ -53,7 +55,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
         /*********************************************************
          *  latent factor                                        *
          *********************************************************/
-#if USEORGCODE
+#ifdef USEORGCODE
         index_t aligned_k = model.get_aligned_k();
         index_t align0 = model.get_aligned_k() * aux_size;
 #else
@@ -69,7 +71,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
             if (j1 >= num_feat) continue;
             real_t v1 = iter->feat_val;
             real_t *w = model.GetParameter_v() + j1 * align0;
-#if USEORGCODE
+#ifdef USEORGCODE
             __m128 XMMv = _mm_set1_ps(v1*norm);
             for (index_t d = 0; d < aligned_k; d += kAlign) {
               __m128 XMMs = _mm_load_ps(s+d);
@@ -87,7 +89,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
             }                                              // }
 #endif
         }
-#if USEORGCODE
+#ifdef USEORGCODE
         __m128 XMMt = _mm_set1_ps(0.0f);
 #else
         real_t _XMMt = 0.0f;
@@ -99,7 +101,7 @@ real_t FMScore::CalcScore(const SparseRow* row,
             if (j1 >= num_feat) continue;
             real_t v1 = iter->feat_val;
             real_t *w = model.GetParameter_v() + j1 * align0;
-#if USEORGCODE
+#ifdef USEORGCODE
             __m128 XMMv = _mm_set1_ps(v1*norm);
             for (index_t d = 0; d < aligned_k; d += kAlign) {
               __m128 XMMs = _mm_load_ps(s+d);
@@ -138,7 +140,7 @@ void FMScore::CalcGrad(const SparseRow* row,
   if (opt_type_.compare("sgd") == 0) {
     this->calc_grad_sgd(row, model, pg, norm);
   }
-#if USEORGCODE
+#ifdef USEORGCODE
   // Using adagrad
   else if (opt_type_.compare("adagrad") == 0) {
     this->calc_grad_adagrad(row, model, pg, norm);
@@ -181,7 +183,7 @@ void FMScore::calc_grad_sgd(const SparseRow* row,
   /*********************************************************
    *  latent factor                                        *
    *********************************************************/
-#if USEORGCODE
+#ifdef USEORGCODE
         index_t aligned_k = model.get_aligned_k();
         index_t align0 = model.get_aligned_k() * model.GetAuxiliarySize();
         __m128 XMMpg = _mm_set1_ps(pg);
@@ -203,7 +205,7 @@ void FMScore::calc_grad_sgd(const SparseRow* row,
     if (j1 >= num_feat) continue;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-#if USEORGCODE
+#ifdef USEORGCODE
     __m128 XMMv = _mm_set1_ps(v1*norm);
     for (index_t d = 0; d < aligned_k; d += kAlign) {
       __m128 XMMs = _mm_load_ps(s+d);
@@ -228,7 +230,7 @@ void FMScore::calc_grad_sgd(const SparseRow* row,
     if (j1 >= num_feat) continue;
     real_t v1 = iter->feat_val;
     real_t *w = model.GetParameter_v() + j1 * align0;
-#if USEORGCODE
+#ifdef USEORGCODE
     __m128 XMMv = _mm_set1_ps(v1*norm);
     __m128 XMMpgv = _mm_mul_ps(XMMpg, XMMv);
     for(index_t d = 0; d < aligned_k; d += kAlign) {
@@ -252,7 +254,7 @@ void FMScore::calc_grad_sgd(const SparseRow* row,
   }
 }
 
-#if SEORGCODE
+#ifdef USEORGCODE
 // Calculate gradient and update current model using adagrad
 void FMScore::calc_grad_adagrad(const SparseRow* row,
                                 Model& model,
