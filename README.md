@@ -9,3 +9,4 @@ cplusplus_fm 文件夹是 fm网络,支持embedding训练
 
 demo/classification/criteo_ctr/small_test.txt,small_train.txt 是用于cplusplus_youtubeDnn的数据样例
 
+src 没有用可以删除
